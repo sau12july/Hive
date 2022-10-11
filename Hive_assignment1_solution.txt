@@ -109,7 +109,7 @@ select qtr_id from (select sum(sales) as totalsale,qtr_id from sales_order_csv g
 // In which country sales was maximum and in which country sales was minimum
 
 
-select a.totalsale,a.city from (select sum(sales) as totalsale,city from sales_order_csv group by city)as a order by a.totalsale asc limit 1 union all select a.totalsale,a.city from (select sum(sales) as totalsale,city from sales_order_csv group by city)as a order by a.totalsale desc limit 1;
+select sum(sales) as totalsale,city from sales_order_csv group by city order by totalsale asc limit 1 union all select sum(sales) as totalsale,city from sales_order_csv group by city order by totalsale desc limit 1;
 
 
 
