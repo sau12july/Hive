@@ -93,19 +93,16 @@ select b.productline as max_sold_product from (select a.productline,a.totalsale 
 
 
 
-//total sale for each quarter
+//Calculate the total sales for each quarter
 
 select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id;           
 
 
 
-select min(a.totalsale) as minimunsale from (select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id) as a;
-
-
 // In which quarter sales was minimum
 
 
-select qtr_id from (select a.qtr_id,a.totalsale from (select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id) as a order by a.totalsale limit 1)as b;
+select qtr_id from (select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id order by totalsale limit 1)as a;
 
 
 
