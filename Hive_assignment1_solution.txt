@@ -1,0 +1,150 @@
+// copy sales_order_data.csv to hdfs location in folder saurabh
+
+
+Hadoop fs -copyFromLocal saurabh/assignment/sales_order_data.csv saurabh
+
+
+
+// creating Table sales_order_csv
+
+
+create table sales_order_csv
+(
+ORDERNUMBER int,
+QUANTITYORDERED int,
+PRICEEACH float,
+ORDERLINENUMBER int,
+SALES float,
+STATUS string,
+QTR_ID int,
+MONTH_ID int,
+YEAR_ID int,
+PRODUCTLINE string,
+MSRP int,
+PRODUCTCODE string,
+PHONE string,
+CITY string,
+STATE string,
+POSTALCODE string,
+COUNTRY string,
+TERRITORY string,
+CONTACTLASTNAME string,
+CONTACTFIRSTNAME string,
+DEALSIZE string
+)
+row format delimited
+fields terminated by ','
+tblproperties("skip.header.line.count"="1");
+
+
+
+// Load data into table
+
+
+load data inpath ‘saurabh/’ into table sales_order_csv;
+
+
+
+// creating ORC table
+
+
+create table sales_order_csv
+(
+ORDERNUMBER int,
+QUANTITYORDERED int,
+PRICEEACH float,
+ORDERLINENUMBER int,
+SALES float,
+STATUS string,
+QTR_ID int,
+MONTH_ID int,
+YEAR_ID int,
+PRODUCTLINE string,
+MSRP int,
+PRODUCTCODE string,
+PHONE string,
+CITY string,
+STATE string,
+POSTALCODE string,
+COUNTRY string,
+TERRITORY string,
+CONTACTLASTNAME string,
+CONTACTFIRSTNAME string,
+DEALSIZE string
+)
+stored as ORC;
+
+
+
+// Load data into ORC table
+
+
+from sales_order_csv insert overwrite table sales_order_orc select *;
+
+
+
+
+// Calculatye total sales per year
+
+select sum(sales) as totalsale,year_id from sales_order_csv group by year_id;
+
+
+
+// Find a product for which maximum orders were placed
+
+select b.productline from (select a.productline,a.totalsale from (select productline,sum(quantityordered) as totalsale from sales_order_csv group by productline) as a order by a.totalsale desc limit 1)as b;
+
+
+
+//total sale for each quarter
+
+select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id;           
+
+
+
+select min(a.totalsale) as minimunsale from (select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id) as a;
+
+
+// In which quarter sales was minimum
+
+
+select qtr_id from (select a.qtr_id,a.totalsale from (select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id) as a order by a.totalsale limit 1)as b;
+
+
+
+// In which country sales was maximum and in which country sales was minimum
+
+
+select a.totalsale,a.city from (select sum(sales) as totalsale,city from sales_order_csv group by city)as a order by a.totalsale asc limit 1 union all select a.totalsale,a.city from (select sum(sales) as totalsale,city from sales_order_csv group by city)as a order by a.totalsale desc limit 1;
+
+
+
+//Calculate quartelry sales for each city
+
+
+select qtr_id,city,sum(sales) as total_sale from sales_order_csv group by city,qtr_id;
+
+
+// Find a month for each year in which maximum number of quantities were sold
+
+
+select month_id ,b.year_id as year,b.total_sale as total_sale from (select year_id,max(total_sale) as total_sale from (select month_id,year_id,sum(quantityordered) as total_sale from sales_order_csv group by month_id,year_id)as a group by year_id) as b inner join (select month_id,year_id,sum(quantityordered) as total_sale from sales_order_csv group by month_id,year_id) as c on c.total_sale=b.total_sale;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
