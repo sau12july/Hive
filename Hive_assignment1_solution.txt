@@ -89,7 +89,7 @@ select sum(sales) as totalsale,year_id from sales_order_csv group by year_id;
 
 // Find a product for which maximum orders were placed
 
-select b.productline as max_sold_product from (select a.productline,a.totalsale from (select productline,sum(quantityordered) as totalsale from sales_order_csv group by productline) as a order by a.totalsale desc limit 1)as b;
+select productline from (select productline,sum(quantityordered) as totalsale from sales_order_csv group by productline order by totalsale desc limit 1)as a;
 
 
 
