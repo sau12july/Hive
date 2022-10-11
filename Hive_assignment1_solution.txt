@@ -75,9 +75,7 @@ stored as ORC;
 
 // Load data into ORC table
 
-
 from sales_order_csv insert overwrite table sales_order_orc select *;
-
 
 
 
@@ -101,13 +99,11 @@ select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id;
 
 // In which quarter sales was minimum
 
-
 select qtr_id from (select sum(sales) as totalsale,qtr_id from sales_order_csv group by qtr_id order by totalsale limit 1)as a;
 
 
 
 // In which country sales was maximum and in which country sales was minimum
-
 
 select sum(sales) as totalsale,city from sales_order_csv group by city order by totalsale asc limit 1 union all select sum(sales) as totalsale,city from sales_order_csv group by city order by totalsale desc limit 1;
 
@@ -115,12 +111,10 @@ select sum(sales) as totalsale,city from sales_order_csv group by city order by 
 
 //Calculate quartelry sales for each city
 
-
 select qtr_id,city,sum(sales) as total_sale from sales_order_csv group by city,qtr_id;
 
 
 // Find a month for each year in which maximum number of quantities were sold
-
 
 select month_id ,b.year_id as year,b.total_sale as total_sale from (select year_id,max(total_sale) as total_sale from (select month_id,year_id,sum(quantityordered) as total_sale from sales_order_csv group by month_id,year_id)as a group by year_id) as b inner join (select month_id,year_id,sum(quantityordered) as total_sale from sales_order_csv group by month_id,year_id) as c on c.total_sale=b.total_sale;
 
